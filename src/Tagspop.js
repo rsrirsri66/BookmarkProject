@@ -1,7 +1,6 @@
-// TagsPopup.js
 import React from 'react';
 
-const TagsPopup = ({
+const TagsPopupstore = ({
   tags,
   handleRemoveTag,
   handleInputChange,
@@ -40,4 +39,4 @@ const TagsPopup = ({
   );
 };
 
-export default TagsPopup;
+export default TagsPopupstore;

@@ -170,31 +170,40 @@ body {
 .existing li strong {
   color: rgb(201, 131, 1);
 }
+
+/* Table styling */
 .table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin-top: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow for depth */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-.table th,
-.table td {
-  border: 1px solid #dee2e6; /* Light gray border */
+.table td,
+.table th {
+  border: 1px solid #ddd;
   padding: 12px;
   text-align: left;
 }
 
 .table th {
-  background-color: #007bff; /* Blue color for table headers */
-  color: #000000; /* White text color for table headers */
+  background-color: #007bff;
+  color: #000000;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
 }
 
 .table tr:nth-child(even) {
-  background-color: #f8f9fa; /* Light gray background for even rows */
+  background-color: #f8f9fa;
 }
 
 .table tr:hover {
-  background-color: #e2e6ea; /* Lighter gray background on hover */
+  background-color: #c4cbd1;
+  transition: background-color 0.3s ease;
 }
 
 /* Input styling */
@@ -203,17 +212,73 @@ body {
   border: none;
   background-color: transparent;
   cursor: pointer;
-  color: #007bff; /* Blue color for links */
+  color: #007bff;
   text-decoration: underline;
+  transition: color 0.3s ease;
 }
 
 .table input:hover {
-  color: #0056b3; /* Darker blue color on hover */
+  color: #0056b3;
 }
 
 /* Button styling */
 .btn-danger,
 .btn-info,
 .btn-success {
-  margin-right: 5px; /* Add a small margin between buttons */
+  margin-right: 5px;
+  border-radius: 5px;
+}
+
+/* Add a subtle shadow on buttons */
+.btn-danger,
+.btn-info,
+.btn-success,
+.btn-primary {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom styles for specific buttons */
+.btn-success {
+  background-color: #28a745;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+}
+
+.btn-primary {
+  background-color: #007bff;
+}
+
+/* Links in table cells */
+.table td a {
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.table td a:hover {
+  color: #0056b3;
+}
+
+.table td a:hover,
+.table td a:active {
+  color: #287d2a;
+}
+
+/* Add an icon indicating an external link */
+.table td a::after {
+  content: '\2197'; /* Unicode character for northeast arrow */
+  margin-left: 5px;
+  font-size: 12px;
+}
+
+/* Optionally, underline the URL on hover for emphasis */
+.table td a:hover {
+  text-decoration: underline;
+}
+/* Button hover animation */
+.btn-danger:hover, .btn-info:hover, .btn-success:hover, .btn-primary:hover {
+  transform: translateY(-2px); /* Move up on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

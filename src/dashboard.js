@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import './css/dashboard.css'
 import TagsPopup from './tags';
+import TagsPopupstore from './Tagspop';
+import { fetchBookmarks, addBookmark ,updateBookmarkApi} from './api';
 const Dash = () => {
   const [url, seturl]= useState('');
   const [title, settitle]=useState('');
@@ -11,6 +12,62 @@ const Dash = () => {
   const [isFormVisible, setFormVisible] = useState(false);
   const [bookmarks, setBookmarks] = useState([]); 
   const [isTagsPopupVisible, setTagsPopupVisible] = useState(false);
+  const [editingBookmarkIndex, setEditingBookmarkIndex] = useState(null);
+  
+  const fetchAndUpdateBookmarks = async () => {
+    try {
+      const bookmarksData = await fetchBookmarks();
+      setBookmarks(bookmarksData);
+    } catch (error) {
+      // Handle error
+      console.error('Error fetching bookmarks:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAndUpdateBookmarks();
+  }, []);
+
+  const handleSaveBookmark = async (index) => {
+    try {
+      const updatedBookmark = {
+        id: bookmarks[index].id,
+        url: url,
+        title: title,
+        description: description,
+        tags: tags,
+      };
+
+     // Update the bookmark using the API function
+     await updateBookmarkApi(updatedBookmark);
+
+     // Fetch updated bookmarks after updating
+     const updatedBookmarksData = await fetchBookmarks();
+ 
+     // Find the index of the updated bookmark in the new data
+    const updatedIndex = updatedBookmarksData.findIndex((bookmark) => bookmark.id === updatedBookmark.id);
+
+    // Update the state with the new bookmarks array
+    setBookmarks((prevBookmarks) => {
+      const newBookmarks = [...prevBookmarks];
+      newBookmarks[index] = updatedBookmarksData[updatedIndex];
+      return newBookmarks;
+    });
+ 
+     // Reset the form and editing state
+     seturl('');
+     settitle('');
+     setdescription('');
+     setTags([]);
+     setEditingBookmarkIndex(null);
+   } catch (error) {
+     // Handle error
+     console.error('Error in handleSaveBookmark:', error);
+   }
+ };
+
+
+
   const handleDeleteBookmark = (index) => {
     // Create a copy of the current bookmarks array
     const updatedBookmarks = [...bookmarks];
@@ -19,19 +76,7 @@ const Dash = () => {
     // Update the state with the new bookmarks array
     setBookmarks(updatedBookmarks);
   };
-  const handleEditBookmark = (index) => {
-    // Assuming you want to edit the bookmark in a form within the same component
-    const bookmarkToEdit = bookmarks[index];
-    // Set the form fields with the data of the bookmark to be edited
-    seturl(bookmarkToEdit.url);
-    settitle(bookmarkToEdit.title);
-    setdescription(bookmarkToEdit.description);
-    setTags(bookmarkToEdit.tags || []); // Ensure tags is an array
-    // Show the form by setting isFormVisible to true
-    setFormVisible(true);
-    // Optionally, you can remove the edited bookmark from the list
-    handleDeleteBookmark(index);
-  };
+
   const handleShareBookmark = (index) => {
     // Assuming you want to share the bookmark in a modal or perform some sharing functionality
     const bookmarkToShare = bookmarks[index];
@@ -43,29 +88,44 @@ const Dash = () => {
   const toggleTagsPopupVisibility = () => {
     setTagsPopupVisible(!isTagsPopupVisible);
   };
+
+
   useEffect(() => {
-    // Fetch data from the API when the component mounts
-    axios.get('http://localhost:6002/book')
-      .then((response) => {
-        setBookmarks(response.data); // Assuming the API response is an array of bookmarks
-      })
-      .catch((error) => {
-        console.error('Error fetching bookmarks:', error);
-      });
+    const fetchData = async () => {
+      try {
+        const bookmarksData = await fetchBookmarks();
+        setBookmarks(bookmarksData);
+      } catch (error) {
+        // Handle error
+      }
+    };
+
+    fetchData();
   }, []);
   
-  const handleAddBookmark=()=>{
-     // Create a new bookmark object
-     const newBookmark = { url, title, description, tags };
-      // Update the bookmarks state with the new bookmark
-     setBookmarks([...bookmarks, newBookmark]);
-      // Clear the form after adding the bookmark 
+  const handleAddBookmark = async () => {
+    try {
+      const newBookmark = { url, title, description, tags };
+      // Add logic for adding a bookmark using the API
+      await addBookmark(newBookmark);
+
+      // Fetch updated bookmarks after adding a new one
+      const bookmarksData = await fetchBookmarks();
+      setBookmarks(bookmarksData);
+
+      // Clear the form after adding the bookmark
       seturl('');
       settitle('');
       setdescription('');
       setTags([]);
       setFormVisible(false);
-  }
+    } catch (error) {
+      // Handle error
+      console.error('Error in handleAddBookmark:', error);
+    }
+  };
+
+
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
   };
@@ -101,7 +161,7 @@ const Dash = () => {
           > 
             <li>Add bookmarks</li>
           </button>
-          <a href="# " style={{ color: 'rgb(201, 131, 1)' }} onClick={(e) => { e.preventDefault(); toggleTagsPopupVisibility(); }}>
+          <a href="# " style={{ color: 'rgb(201, 131, 1)' }} >
   <li>Tags</li>
 </a>
 
@@ -198,42 +258,121 @@ const Dash = () => {
       </tr>
     </thead>
     <tbody>
-      {bookmarks.map((bookmark, index) => (
-        <tr key={index}>
-          <td>{bookmark.title}</td>
-          <td>
-            <input
-              type="text"
-              readOnly
-              value={bookmark.url}
-              onClick={() => window.open(bookmark.url, '_blank')}
-            />
-          </td>
-          <td>{bookmark.tags ? bookmark.tags.join(', ') : 'No tags'}</td>
-          <td>{bookmark.description}</td>
-          <td>
+  {bookmarks.map((bookmark, index) => (
+    <tr key={bookmark.id}>
+     
+      <td>
+  {editingBookmarkIndex === index ? (
+    <input
+      type="text"
+      value={title}
+      onChange={(e) => settitle(e.target.value)}
+    />
+  ) : (
+    bookmark.title
+  )}
+</td>
+<td>
+  {editingBookmarkIndex === index ? (
+    <input
+      type="text"
+      value={url}
+      onChange={(e) => seturl(e.target.value)}
+    />
+  ) : (
+    <a href={bookmark.url} target="_blank" rel="noopener noreferrer">
+    {bookmark.url}
+    </a>
+  )}
+</td>
+<td>
+  {editingBookmarkIndex === index ? (
+    <input
+      type="text"
+      value={tags ? tags.join(', ') : ''}
+      onChange={(e) => setTags(e.target.value.split(','))}
+    />
+  ) : (
+    tags ? tags.join(', ') : 'No tags'
+  )}
+</td>
+
+<td>
+  {editingBookmarkIndex === index ? (
+    <textarea
+      value={description}
+      onChange={(e) => setdescription(e.target.value)}
+    />
+  ) : (
+    bookmark.description
+  )}
+</td>
+
+      <td>
+        {editingBookmarkIndex === index ? (
+          <>
+            <button
+              className="btn btn-success btn-sm"
+              onClick={() => {
+                 // Save changes using an updateBookmark function
+              const updatedBookmarks = [...bookmarks];
+              updatedBookmarks[index].title = title; // Update the title in the specific bookmark
+              updatedBookmarks[index].title = title;
+              updatedBookmarks[index].url = url;
+              updatedBookmarks[index].tags = tags;
+              updatedBookmarks[index].description = description;
+              setBookmarks(updatedBookmarks);
+              // Update the state to stop editing
+              setEditingBookmarkIndex(null);
+              handleSaveBookmark(index)
+              }}
+            >
+              Save
+            </button>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => {
+                // Cancel editing and revert changes
+                settitle(bookmark.title);
+                seturl(bookmark.url);
+                setTags(bookmark.tags);
+                setdescription(bookmark.description)
+                setEditingBookmarkIndex(null);
+              }}
+            >
+              Cancel
+            </button>
+          </>
+        ) : (
+          <>
             <button
               className="btn btn-danger btn-sm"
-              onClick={() => handleDeleteBookmark(index)} // Assuming you have a function for handling delete
+              onClick={() => handleDeleteBookmark(index)}
             >
               Delete
             </button>
             <button
-              className="btn btn-info btn-sm"
-              onClick={() => handleEditBookmark(index)} // Assuming you have a function for handling edit
-            >
-              Edit
-            </button>
-            <button
               className="btn btn-success btn-sm"
-              onClick={() => handleShareBookmark(index)} // Assuming you have a function for handling share
+              onClick={() => handleShareBookmark(index)}
             >
               Share
             </button>
-          </td>
-        </tr>
-      ))}
-    </tbody>
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => {
+                setEditingBookmarkIndex(index);
+                settitle(bookmark.title);
+              }}
+            >
+              Edit
+            </button>
+          </>
+        )}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
   </table>
 </div>
 
