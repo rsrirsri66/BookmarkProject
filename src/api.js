@@ -40,3 +40,12 @@ export const updateBookmarkApi = async (bookmarkData) => {
     throw error;
   }
 };
+
+export const fetchTags = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/tags`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

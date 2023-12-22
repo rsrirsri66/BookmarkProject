@@ -1,38 +1,68 @@
-// TagsPopup.js
-import React from 'react';
-
+import React,{useState,useEffect}from 'react';
+import "./css/tagspop.css"
+import { fetchTags } from './api';
 const TagsPopup = ({
-  tags,
+ 
   handleRemoveTag,
   handleInputChange,
   handleInputKeyDown,
   inputValue,
   closeTagsPopup,
+  suggestedTags,
+  
 }) => {
+  const [tags, setTags] = useState([]);
+
+  useEffect(() => {
+    const fetchTagsData = async () => {
+      try {
+        const tagsData = await fetchTags();
+        setTags(tagsData);
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    };
+
+    fetchTagsData();
+  }, []);
   return (
     <div className="tags-popup">
       <h4>Add Tags</h4>
-      <div className="tags-container">
-        {tags.map((tag, index) => (
-          <div key={index} className="tag">
-            {tag}
-            <button
-              type="button"
-              className="close-btn"
-              onClick={() => handleRemoveTag(tag)}
-            >
-              &times;
-            </button>
-          </div>
-        ))}
+
+      {/* Tags Table */}
+      <table className="tags-table">
+        <thead>
+          <tr>
+            <th>Tags Title</th>
+          </tr>
+        </thead>
+        <tbody>
+          {suggestedTags.map((tag, index) => (
+            <tr key={index}>
+              <td>{tag.title}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Input for Adding Tags */}
+      <div className="tags-input-container">
+        <input 
+          type="text"
+          placeholder="Add tags..."
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyDown={handleInputKeyDown}
+          list="suggestedTags"
+        />
+        <datalist id="suggestedTags">
+          {suggestedTags.map((tag, index) => (
+            <option key={index} value={tag.title} />
+          ))}
+        </datalist>
       </div>
-      <input
-        type="text"
-        placeholder="Add tags..."
-        value={inputValue}
-        onChange={handleInputChange}
-        onKeyDown={handleInputKeyDown}
-      />
+
+      {/* Close Button */}
       <button type="button" onClick={closeTagsPopup}>
         Close
       </button>

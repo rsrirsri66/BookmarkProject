@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import Select from 'react-select';
 import './css/dashboard.css'
-import TagsPopup from './tags';
-import TagsPopupstore from './Tagspop';
-import { fetchBookmarks, addBookmark ,updateBookmarkApi} from './api';
+import TagsPopup from './tags'
+import { fetchBookmarks, addBookmark ,updateBookmarkApi, fetchTags} from './api';
 const Dash = () => {
+  const [allTags, setAllTags] = useState([]);
   const [url, seturl]= useState('');
   const [title, settitle]=useState('');
   const [description,setdescription]=useState('');
@@ -11,9 +12,23 @@ const Dash = () => {
   const [inputValue, setInputValue] = useState('');
   const [isFormVisible, setFormVisible] = useState(false);
   const [bookmarks, setBookmarks] = useState([]); 
-  const [isTagsPopupVisible, setTagsPopupVisible] = useState(false);
   const [editingBookmarkIndex, setEditingBookmarkIndex] = useState(null);
-  
+  const [isTagsPopupVisible, setTagsPopupVisible] = useState(false);//tags.js page
+
+  useEffect(() => {
+    const fetchTagsData = async () => {
+      try {
+        const tagsData = await fetchTags();
+        setAllTags(tagsData);
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    };
+
+    fetchTagsData();
+  }, []);
+
+
   const fetchAndUpdateBookmarks = async () => {
     try {
       const bookmarksData = await fetchBookmarks();
@@ -23,10 +38,26 @@ const Dash = () => {
       console.error('Error fetching bookmarks:', error);
     }
   };
-
   useEffect(() => {
     fetchAndUpdateBookmarks();
   }, []);
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleInputKeyDown = (e) => {
+    if (e.key === 'Enter' && inputValue.trim() !== '') {
+      setTags([...tags, inputValue.trim()]);
+      setInputValue('');
+    }
+  };
+  const toggleFormVisibility = () => {
+    setFormVisible(!isFormVisible);
+  };
+
+  const toggleTagsPopupVisibility = () => {
+    setTagsPopupVisible(!isTagsPopupVisible);
+  };//tags.js page
 
   const handleSaveBookmark = async (index) => {
     try {
@@ -83,13 +114,6 @@ const Dash = () => {
     // Display a modal or perform sharing functionality based on the bookmarkToShare data
     console.log(`Share bookmark at index ${index}`, bookmarkToShare);
   };
-
-
-  const toggleTagsPopupVisibility = () => {
-    setTagsPopupVisible(!isTagsPopupVisible);
-  };
-
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -124,24 +148,11 @@ const Dash = () => {
       console.error('Error in handleAddBookmark:', error);
     }
   };
-
-
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-  };
-
-  const handleInputKeyDown = (e) => {
-    if (e.key === 'Enter' && inputValue.trim() !== '') {
-      setTags([...tags, inputValue.trim()]);
-      setInputValue('');
-    }
-  };
   const handleRemoveTag = (tagToRemove) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
-  const toggleFormVisibility = () => {
-    setFormVisible(!isFormVisible);
-  };
+  
+
     return (
     <div>
     <div className='book'>
@@ -161,14 +172,27 @@ const Dash = () => {
           > 
             <li>Add bookmarks</li>
           </button>
-          <a href="# " style={{ color: 'rgb(201, 131, 1)' }} >
-  <li>Tags</li>
-</a>
+       {/* Add a button to toggle TagsPopup visibility //tags.js page*/} 
+       <button style={{ color: 'rgb(201, 131, 1)' }} onClick={toggleTagsPopupVisibility}>
+            <li>Tags</li> 
+          </button>
 
           <a href="snack.html" style={{ color: 'rgb(201, 131, 1)' }} target="_blank"><li>About us</li></a>
           <a href="/register" style={{ color: 'rgb(201, 131, 1)' }}><li>Logout</li></a>
         </ul>
       </div>
+         {/* Display TagsPopup if isTagsPopupVisible is true //tags.js page */}
+         {isTagsPopupVisible && (
+        <TagsPopup
+          tags={tags}
+          handleRemoveTag={handleRemoveTag}
+          handleInputChange={handleInputChange}
+          handleInputKeyDown={handleInputKeyDown}
+          inputValue={inputValue}
+          closeTagsPopup={toggleTagsPopupVisibility}
+          suggestedTags={allTags}
+        />
+      )}
       {isFormVisible && (
         <div className='add-bookmark-form'>
           <h4 className='newbook'>Add New Bookmark</h4>
@@ -375,18 +399,6 @@ const Dash = () => {
 
   </table>
 </div>
-
-       {/* Conditionally render TagsPopup based on state */}
-       {isTagsPopupVisible && (
-        <TagsPopup
-          tags={tags}
-          handleRemoveTag={handleRemoveTag}
-          handleInputChange={handleInputChange}
-          handleInputKeyDown={handleInputKeyDown}
-          inputValue={inputValue}
-          closeTagsPopup={toggleTagsPopupVisibility}
-        />
-      )}
     </div>
   );
 };
