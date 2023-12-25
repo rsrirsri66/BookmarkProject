@@ -49,3 +49,17 @@ export const fetchTags = async () => {
     throw error;
   }
 };
+
+export const addTag = async (newTag) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/addtags`, newTag, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error adding tag:', error);
+    throw error;
+  }
+};

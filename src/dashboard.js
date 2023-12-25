@@ -14,7 +14,44 @@ const Dash = () => {
   const [bookmarks, setBookmarks] = useState([]); 
   const [editingBookmarkIndex, setEditingBookmarkIndex] = useState(null);
   const [isTagsPopupVisible, setTagsPopupVisible] = useState(false);//tags.js page
+  const [selectedTags, setSelectedTags] = useState([]);
+  //pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = bookmarks.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(bookmarks.length / itemsPerPage);
+
+  const renderPaginationControls = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(
+        <button key={i} onClick={() => setCurrentPage(i)}>
+          {i}
+        </button>
+      );
+    }
+    return pageNumbers;
+  };
+  useEffect(() => {
+    const fetchTagsData = async () => {
+      try {
+        const tagsData = await fetchTags();
+        if (tagsData) {
+          setAllTags(tagsData);
+        } else {
+          console.error('Tags data is undefined.');
+        }
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    };
+  
+    fetchTagsData();
+  }, []);
   useEffect(() => {
     const fetchTagsData = async () => {
       try {
@@ -66,7 +103,7 @@ const Dash = () => {
         url: url,
         title: title,
         description: description,
-        tags: tags,
+      
       };
 
      // Update the bookmark using the API function
@@ -141,7 +178,7 @@ const Dash = () => {
       seturl('');
       settitle('');
       setdescription('');
-      setTags([]);
+      setSelectedTags([]);
       setFormVisible(false);
     } catch (error) {
       // Handle error
@@ -233,34 +270,18 @@ const Dash = () => {
               onChange={(e) => setdescription(e.target.value)}
             ></textarea>
           </div>
-          <div className='mb-3'>
-            <label htmlFor='tags' className='form-label'>
-              Tags
-            </label>
-            <div className='tags-input'>
-              <div className='tags-container'>
-                {tags.map((tag, index) => (
-                  <div key={index} className='tag'>
-                    {tag}
-                    <button
-                      type='button'
-                      className='close-btn'
-                      onClick={() => handleRemoveTag(tag)}
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <input
-                type='text'
-                placeholder='Add tags...'
-                value={inputValue}
-                onChange={handleInputChange}
-                onKeyDown={handleInputKeyDown}
-              />
-            </div>
-          </div>
+          <div className="mb-3">
+    <label htmlFor="tags" className="form-label">
+      Tags
+    </label>
+    <Select
+      isMulti
+      options={allTags.map((tag) => ({ value: tag.title, label: tag.title }))}
+      value={selectedTags}
+      onChange={(selectedOptions) => setSelectedTags(selectedOptions)}
+    />
+  </div>
+        
           <button type="button" className="btn btn-primary"  onClick={handleAddBookmark}>
             Add Bookmark
           </button>
@@ -276,13 +297,12 @@ const Dash = () => {
       <tr>
         <th>Title</th>
         <th>URL</th>
-        <th>Tags</th>
         <th>Description</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-  {bookmarks.map((bookmark, index) => (
+  {currentItems.map((bookmark, index) => (
     <tr key={bookmark.id}>
      
       <td>
@@ -307,17 +327,6 @@ const Dash = () => {
     <a href={bookmark.url} target="_blank" rel="noopener noreferrer">
     {bookmark.url}
     </a>
-  )}
-</td>
-<td>
-  {editingBookmarkIndex === index ? (
-    <input
-      type="text"
-      value={tags ? tags.join(', ') : ''}
-      onChange={(e) => setTags(e.target.value.split(','))}
-    />
-  ) : (
-    tags ? tags.join(', ') : 'No tags'
   )}
 </td>
 
@@ -398,6 +407,9 @@ const Dash = () => {
 </tbody>
 
   </table>
+  <div className="pagination-controls">
+          {renderPaginationControls()}
+        </div>
 </div>
     </div>
   );

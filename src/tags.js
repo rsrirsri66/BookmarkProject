@@ -1,6 +1,6 @@
 import React,{useState,useEffect}from 'react';
 import "./css/tagspop.css"
-import { fetchTags } from './api';
+import { fetchTags , addTag } from './api';
 const TagsPopup = ({
  
   handleRemoveTag,
@@ -12,6 +12,22 @@ const TagsPopup = ({
   
 }) => {
   const [tags, setTags] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(4);
+  const handleAddTag = async () => {
+    try {
+      // Add the new tag to the state
+      setTags([...tags, { title: inputValue }]);
+  
+      // Clear the input field
+      handleInputChange({ target: { value: '' } });
+  
+      // Add the new tag to the database
+      await addTag({ title: inputValue });
+    } catch (error) {
+      console.error('Error adding tag:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchTagsData = async () => {
@@ -25,6 +41,23 @@ const TagsPopup = ({
 
     fetchTagsData();
   }, []);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentTags = suggestedTags.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(suggestedTags.length / itemsPerPage);
+
+  const renderPaginationControls = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(
+        <button key={i} onClick={() => setCurrentPage(i)}>
+          {i}
+        </button>
+      );
+    }
+    return pageNumbers;
+  };
   return (
     <div className="tags-popup">
       <h4>Add Tags</h4>
@@ -37,13 +70,17 @@ const TagsPopup = ({
           </tr>
         </thead>
         <tbody>
-          {suggestedTags.map((tag, index) => (
+          {currentTags.map((tag, index) => (
             <tr key={index}>
               <td>{tag.title}</td>
             </tr>
           ))}
         </tbody>
       </table>
+       {/* Pagination Controls */}
+       <div className="pagination-controls">
+        {renderPaginationControls()}
+      </div>
 
       {/* Input for Adding Tags */}
       <div className="tags-input-container">
@@ -60,7 +97,13 @@ const TagsPopup = ({
             <option key={index} value={tag.title} />
           ))}
         </datalist>
+           {/* Button to add the tag */}
+           <button type="button" onClick={handleAddTag}>
+          Add Tag
+        </button>
       </div>
+     
+    
 
       {/* Close Button */}
       <button type="button" onClick={closeTagsPopup}>
