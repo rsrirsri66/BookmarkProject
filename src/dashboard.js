@@ -298,6 +298,7 @@ const Dash = () => {
         <th>Title</th>
         <th>URL</th>
         <th>Description</th>
+        <th>Tags</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -340,6 +341,18 @@ const Dash = () => {
     bookmark.description
   )}
 </td>
+<td>
+{editingBookmarkIndex === index ? (
+    <input
+      type="text"
+      value={tags}
+      onChange={(e) => settitle(e.target.value)}
+    />
+  ) : (
+    bookmark.tag_title
+  )}
+</td>
+
 
       <td>
         {editingBookmarkIndex === index ? (
