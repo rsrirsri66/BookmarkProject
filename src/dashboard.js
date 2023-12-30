@@ -78,6 +78,7 @@ const Dash = () => {
   useEffect(() => {
     fetchAndUpdateBookmarks();
   }, []);
+  
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
   };
@@ -85,6 +86,7 @@ const Dash = () => {
   const handleInputKeyDown = (e) => {
     if (e.key === 'Enter' && inputValue.trim() !== '') {
       setTags([...tags, inputValue.trim()]);
+      console.log("tags"+inputValue)
       setInputValue('');
     }
   };
@@ -166,7 +168,10 @@ const Dash = () => {
   
   const handleAddBookmark = async () => {
     try {
+      let tags = selectedTags.map(tag => tag.value)
       const newBookmark = { url, title, description, tags };
+      console.log(selectedTags);
+      console.log(tags);
       // Add logic for adding a bookmark using the API
       await addBookmark(newBookmark);
 
@@ -195,9 +200,7 @@ const Dash = () => {
     <div className='book'>
       <title>Booking</title>
       <meta charSet="utf-8" />
-      <meta name="viewport" content="width=device-width,initial-scale=1" />
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" />
-      <link rel="stylesheet" href="style.css" />
       <center><h3 className='mybook'><b>My Bookmarks</b></h3></center>
       
       <div className='tabular' style={{ color: 'rgb(201, 131, 1)' }}>
@@ -214,7 +217,7 @@ const Dash = () => {
             <li>Tags</li> 
           </button>
 
-          <a href="snack.html" style={{ color: 'rgb(201, 131, 1)' }} target="_blank"><li>About us</li></a>
+          <a href="snack.html" style={{ color: 'rgb(201, 131, 1)' }} target="_blank"><li>Search</li></a>
           <a href="/register" style={{ color: 'rgb(201, 131, 1)' }}><li>Logout</li></a>
         </ul>
       </div>

@@ -78,7 +78,7 @@ const TagsPopup = ({
         </tbody>
       </table>
        {/* Pagination Controls */}
-       <div className="pagination-controls">
+       <div className="tags-pagination-controls">
         {renderPaginationControls()}
       </div>
 

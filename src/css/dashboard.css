@@ -246,3 +246,47 @@ body {
   transform: translateY(-2px); /* Move up on hover */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+/*pagination style */
+.pagination-controls {
+  position: absolute;
+  top: 143px;
+  right: 0px;
+  margin: 10px;
+}
+
+.pagination-controls button {
+  margin-left: 5px; /* Adjust the spacing between pagination numbers */
+  background-color: #007bff; /* Customize the background color */
+  color: #fff; /* Customize the text color */
+  border: 1px solid #007bff; /* Customize the border color */
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 3px;
+}
+
+.pagination-controls button:hover {
+  background-color: #193450; 
+  border-color: #0056b3; 
+  color: #ffffff; 
+}
+
+.tags-pagination-controls button {
+  margin-left: 5px; /* Adjust the spacing between pagination numbers */
+  background-color: #007bff; /* Customize the background color */
+  color: #fff; /* Customize the text color */
+  border: 1px solid #007bff; /* Customize the border color */
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 3px;
+}
+.error-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border: 1px solid red;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
