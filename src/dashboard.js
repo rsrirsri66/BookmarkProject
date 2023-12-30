@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import './css/dashboard.css'
 import TagsPopup from './tags'
+import SearchPopup from './SearchPopup';
 import { fetchBookmarks, addBookmark ,updateBookmarkApi, fetchTags} from './api';
 const Dash = () => {
   const [allTags, setAllTags] = useState([]);
@@ -15,6 +16,11 @@ const Dash = () => {
   const [editingBookmarkIndex, setEditingBookmarkIndex] = useState(null);
   const [isTagsPopupVisible, setTagsPopupVisible] = useState(false);//tags.js page
   const [selectedTags, setSelectedTags] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [isSearchPopupVisible, setSearchPopupVisible] = useState(false);
+  const toggleSearchPopupVisibility = () => {
+    setSearchPopupVisible(!isSearchPopupVisible);
+  };
   //pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -168,10 +174,33 @@ const Dash = () => {
   
   const handleAddBookmark = async () => {
     try {
+       // Check if any of the required fields are empty
+    if (!url.trim() || !title.trim() || !selectedTags.length || !description.trim()) {
+      setErrorMessage('Please fill in all required fields');
+      return;
+    }
+
+       // Check if the URL already exists in the frontend state (optional)
+    const urlExistsInFrontend = bookmarks.some((bookmark) => bookmark.url === url);
+    if (urlExistsInFrontend) {
+      // Handle the case where the URL already exists in the frontend state
+      setErrorMessage('URL already exists');
+      console.error('Bookmark with this URL already exists in the frontend');
+      return;
+    }
+
+    // Check if the URL already exists in the backend
+    const existingBookmark = await fetchBookmarks();
+    const urlExistsInBackend = existingBookmark.some((bookmark) => bookmark.url === url);
+    if (urlExistsInBackend) {
+      // Handle the case where the URL already exists in the backend
+      setErrorMessage(' URL already exists ss');
+      console.error('Bookmark with this URL already exists in the backend');
+      return;
+    }
+
       let tags = selectedTags.map(tag => tag.value)
       const newBookmark = { url, title, description, tags };
-      console.log(selectedTags);
-      console.log(tags);
       // Add logic for adding a bookmark using the API
       await addBookmark(newBookmark);
 
@@ -185,9 +214,11 @@ const Dash = () => {
       setdescription('');
       setSelectedTags([]);
       setFormVisible(false);
+      setErrorMessage(null);
     } catch (error) {
       // Handle error
       console.error('Error in handleAddBookmark:', error);
+      setErrorMessage('An error occurred while adding the bookmark');
     }
   };
   const handleRemoveTag = (tagToRemove) => {
@@ -197,6 +228,7 @@ const Dash = () => {
 
     return (
     <div>
+
     <div className='book'>
       <title>Booking</title>
       <meta charSet="utf-8" />
@@ -217,10 +249,19 @@ const Dash = () => {
             <li>Tags</li> 
           </button>
 
-          <a href="snack.html" style={{ color: 'rgb(201, 131, 1)' }} target="_blank"><li>Search</li></a>
+          <button style={{ color: 'rgb(201, 131, 1)' }} onClick={toggleSearchPopupVisibility}>
+            <li>Search</li>
+          </button>
           <a href="/register" style={{ color: 'rgb(201, 131, 1)' }}><li>Logout</li></a>
         </ul>
       </div>
+      {/* Display SearchPopup if isSearchPopupVisible is true */}
+      {isSearchPopupVisible && (
+        <SearchPopup
+          closeSearchPopup={toggleSearchPopupVisibility}
+          bookmarks={bookmarks}
+        />
+      )}
          {/* Display TagsPopup if isTagsPopupVisible is true //tags.js page */}
          {isTagsPopupVisible && (
         <TagsPopup
@@ -290,6 +331,11 @@ const Dash = () => {
           </button>
 
       </form>
+      {errorMessage && (
+      <div className="alert alert-danger" role="alert">
+        {errorMessage}
+      </div>
+    )}
       </div>
       )}
     </div>  

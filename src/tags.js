@@ -98,17 +98,14 @@ const TagsPopup = ({
           ))}
         </datalist>
            {/* Button to add the tag */}
-           <button type="button" onClick={handleAddTag}>
+           <button type="button" onClick={handleAddTag} className='tagbutton'>
           Add Tag
         </button>
-      </div>
-     
-    
-
-      {/* Close Button */}
-      <button type="button" onClick={closeTagsPopup}>
+                 {/* Close Button */}
+      <button type="button" onClick={closeTagsPopup} className='tagbutton'>
         Close
       </button>
+      </div>
     </div>
   );
 };
