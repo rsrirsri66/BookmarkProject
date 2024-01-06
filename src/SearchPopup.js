@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './css/searchpopup.css'
 
-const SearchPopup = ({ closeSearchPopup, bookmarks, setHighlightedIndex }) => {
+const SearchPopup = ({ closeSearchPopup, bookmarks}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [dataNotFound, setDataNotFound] = useState(false);
@@ -11,7 +11,7 @@ const SearchPopup = ({ closeSearchPopup, bookmarks, setHighlightedIndex }) => {
     const results = bookmarks.filter((bookmark) => {
       const includesInUrl = bookmark.url && bookmark.url.includes(searchQuery);
       const includesInTitle = bookmark.title && bookmark.title.includes(searchQuery);
-      const includesInTags = bookmark.tags && bookmark.tags.includes(searchQuery);
+      const includesInTags = bookmark.tag_title && bookmark.tag_title.includes(searchQuery);
   
       return includesInUrl || includesInTitle || includesInTags;
     });
@@ -27,7 +27,10 @@ const SearchPopup = ({ closeSearchPopup, bookmarks, setHighlightedIndex }) => {
         type="text"
         placeholder="Enter to search"
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        onChange={(e) =>{ setSearchQuery(e.target.value);
+          handleSearch()
+        }}
+       
       />
       <button onClick={handleSearch} className='searchbutton' >Search</button>
       <button onClick={closeSearchPopup} className='searchbutton'>Close</button>

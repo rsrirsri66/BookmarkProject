@@ -1,10 +1,15 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:6002';
+const API_BASE_URL = 'http://localhost:6003';
 
 export const fetchBookmarks = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/book`);
+    const response = await axios.get(`${API_BASE_URL}/book`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+localStorage.getItem('token')
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching bookmarks:', error);
@@ -17,6 +22,7 @@ export const addBookmark = async (bookmarkData) => {
     const response = await axios.post(`${API_BASE_URL}/createbooks`, bookmarkData, {
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+localStorage.getItem('token')
       },
     });
     return response.data;
@@ -36,6 +42,7 @@ export const updateBookmarkApi = async (bookmarkData) => {
     const response = await axios.put('http://localhost:6002/update/' + bookmarkData.id, bookmarkData, {
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+localStorage.getItem('token')
       },
     });
     return response.data;
@@ -46,7 +53,12 @@ export const updateBookmarkApi = async (bookmarkData) => {
 
 export const fetchTags = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/tags`);
+    const response = await axios.get(`${API_BASE_URL}/tags`,{
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+localStorage.getItem('token')
+      },
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -58,6 +70,7 @@ export const addTag = async (newTag) => {
     const response = await axios.post(`${API_BASE_URL}/addtags`, newTag, {
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+localStorage.getItem('token')
       },
     });
     return response.data;
@@ -66,3 +79,14 @@ export const addTag = async (newTag) => {
     throw error;
   }
 };
+// Add user
+
+// export const addUser = async (userData) => {
+//   try {
+//     const response = await axios.post(`${API_BASE_URL}/addUser`, userData);
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error adding user:', error);
+//     throw error; // Rethrow the error for the calling function to handle
+//   }
+// };

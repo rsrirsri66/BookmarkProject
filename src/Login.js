@@ -51,6 +51,10 @@ const Login = () => {
       let confirmationResult = window.confirmationResult;
       confirmationResult.confirm(otp).then((result) => {
         let user = result.user;
+        localStorage.setItem('token', user.accessToken);
+        localStorage.setItem('phone', user.phoneNumber);
+        localStorage.setItem('uid', user.uid);
+
         console.log(user);
         alert('User signed in successfully');
       }).catch((error) => {

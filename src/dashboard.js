@@ -3,6 +3,7 @@ import Select from 'react-select';
 import './css/dashboard.css'
 import TagsPopup from './tags'
 import SearchPopup from './SearchPopup';
+import FilterPopup from './FilterPopup';
 import { fetchBookmarks, addBookmark ,updateBookmarkApi, fetchTags} from './api';
 const Dash = () => {
   const [allTags, setAllTags] = useState([]);
@@ -20,6 +21,46 @@ const Dash = () => {
   const [isSearchPopupVisible, setSearchPopupVisible] = useState(false);
   const toggleSearchPopupVisibility = () => {
     setSearchPopupVisible(!isSearchPopupVisible);
+  };
+  //sort
+  const [selectedFilter] = useState('');
+
+   // Sorting logic
+   const performSort = (a, b, sortDirection) => {
+    // Modify your sorting logic based on your data structure
+    // This is a simple example, you might need to adjust it according to your needs
+    const valueA = a.title.toLowerCase();
+    const valueB = b.title.toLowerCase();
+
+    if (valueA < valueB) {
+      return sortDirection === 'ascending' ? -1 : 1;
+    }
+    if (valueA > valueB) {
+      return sortDirection === 'ascending' ? 1 : -1;
+    }
+    return 0;
+  };
+
+  // Filter and sort logic
+  const applyFilter = (selectedFilter) => {
+    switch (selectedFilter) {
+      case 'ascending':
+        setBookmarks(bookmarks.slice().sort((a, b) => performSort(a, b, 'ascending')));
+        break;
+      case 'descending':
+        setBookmarks(bookmarks.slice().sort((a, b) => performSort(a, b, 'descending')));
+        break;
+      // Add more filter options and their handling as needed
+      default:
+        // Handle other filter options or set a default action
+    }
+  };
+
+  //filter
+  const [isFilterPopupVisible, setFilterPopupVisible] = useState(false);
+
+  const toggleFilterPopupVisibility = () => {
+    setFilterPopupVisible(!isFilterPopupVisible);
   };
   //pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -252,7 +293,24 @@ const Dash = () => {
           <button style={{ color: 'rgb(201, 131, 1)' }} onClick={toggleSearchPopupVisibility}>
             <li>Search</li>
           </button>
-          <a href="/register" style={{ color: 'rgb(201, 131, 1)' }}><li>Logout</li></a>
+          <div className='tabular' style={{ color: 'rgb(201, 131, 1)' }}>
+     
+          {/* ... (existing code) */}
+          <button style={{ color: 'rgb(201, 131, 1)' }} onClick={toggleFilterPopupVisibility}>
+            <li>Filter</li>
+          </button>
+     
+      </div>
+
+      {/* Display the filter modal if isFilterModalVisible is true */}
+      {isFilterPopupVisible && (
+        <FilterPopup
+          selectedFilter={selectedFilter}
+          applyFilter={applyFilter}
+          toggleFilterPopupVisibility={toggleFilterPopupVisibility}
+        />
+      )}
+
         </ul>
       </div>
       {/* Display SearchPopup if isSearchPopupVisible is true */}
@@ -395,7 +453,7 @@ const Dash = () => {
     <input
       type="text"
       value={tags}
-      onChange={(e) => settitle(e.target.value)}
+      onChange={(e) => setTags(e.target.value)}
     />
   ) : (
     bookmark.tag_title
@@ -412,9 +470,8 @@ const Dash = () => {
                  // Save changes using an updateBookmark function
               const updatedBookmarks = [...bookmarks];
               updatedBookmarks[index].title = title; // Update the title in the specific bookmark
-              updatedBookmarks[index].title = title;
               updatedBookmarks[index].url = url;
-              updatedBookmarks[index].tags = tags;
+              updatedBookmarks[index].tag_title = tags;
               updatedBookmarks[index].description = description;
               setBookmarks(updatedBookmarks);
               // Update the state to stop editing
@@ -430,7 +487,7 @@ const Dash = () => {
                 // Cancel editing and revert changes
                 settitle(bookmark.title);
                 seturl(bookmark.url);
-                setTags(bookmark.tags);
+                setTags(bookmark.tag_title);
                 setdescription(bookmark.description)
                 setEditingBookmarkIndex(null);
               }}
@@ -457,6 +514,9 @@ const Dash = () => {
               onClick={() => {
                 setEditingBookmarkIndex(index);
                 settitle(bookmark.title);
+                seturl(bookmark.url);
+                setTags(bookmark.tag_title);
+                setdescription(bookmark.description)
               }}
             >
               Edit

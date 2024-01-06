@@ -44,7 +44,7 @@ body {
 .tabular ul {
   list-style-type: none;
   padding: 0;
-  margin: 0;
+  margin: 20px;
   display: flex;
   justify-content: space-around;
   background-color: #000000;
@@ -278,4 +278,7 @@ body {
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 3px;
+}
+.highlighted-row {
+  background-color: #ffffcc; /* Use the background color you prefer */
 }
