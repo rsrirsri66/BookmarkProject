@@ -39,17 +39,20 @@ export const addBookmark = async (bookmarkData) => {
 
 export const updateBookmarkApi = async (bookmarkData) => {
   try {
-    const response = await axios.put('http://localhost:6002/update/' + bookmarkData.id, bookmarkData, {
+    const { id } = bookmarkData;
+    const response = await axios.put(`http://localhost:6003/update/${id}`, bookmarkData, {
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer '+localStorage.getItem('token')
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
       },
+     
     });
     return response.data;
   } catch (error) {
     throw error;
   }
 };
+
 
 export const fetchTags = async () => {
   try {
@@ -79,14 +82,17 @@ export const addTag = async (newTag) => {
     throw error;
   }
 };
-// Add user
+export const deleteBookmarkApi = async (bookmarkId) => {
+  try {
+    const response = await axios.put(`${API_BASE_URL}/delbook/${bookmarkId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      },
+    });
 
-// export const addUser = async (userData) => {
-//   try {
-//     const response = await axios.post(`${API_BASE_URL}/addUser`, userData);
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error adding user:', error);
-//     throw error; // Rethrow the error for the calling function to handle
-//   }
-// };
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

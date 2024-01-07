@@ -11,9 +11,10 @@ const SearchPopup = ({ closeSearchPopup, bookmarks}) => {
     const results = bookmarks.filter((bookmark) => {
       const includesInUrl = bookmark.url && bookmark.url.includes(searchQuery);
       const includesInTitle = bookmark.title && bookmark.title.includes(searchQuery);
+      const includesIndes = bookmark.description && bookmark.description.includes(searchQuery);
       const includesInTags = bookmark.tag_title && bookmark.tag_title.includes(searchQuery);
   
-      return includesInUrl || includesInTitle || includesInTags;
+      return includesInUrl || includesInTitle || includesInTags || includesIndes;
     });
   
     setSearchResults(results);

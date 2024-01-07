@@ -4,7 +4,7 @@ import './css/dashboard.css'
 import TagsPopup from './tags'
 import SearchPopup from './SearchPopup';
 import FilterPopup from './FilterPopup';
-import { fetchBookmarks, addBookmark ,updateBookmarkApi, fetchTags} from './api';
+import { fetchBookmarks, addBookmark ,updateBookmarkApi, fetchTags, deleteBookmarkApi} from './api';
 const Dash = () => {
   const [allTags, setAllTags] = useState([]);
   const [url, seturl]= useState('');
@@ -21,6 +21,12 @@ const Dash = () => {
   const [isSearchPopupVisible, setSearchPopupVisible] = useState(false);
   const toggleSearchPopupVisibility = () => {
     setSearchPopupVisible(!isSearchPopupVisible);
+  };
+  const [isCopied, setIsCopied] = useState(false);
+  const copyToClipboard = (content) => {
+    navigator.clipboard.writeText(content)
+      .then(() => setIsCopied(true))
+      .catch((error) => console.error('Error copying to clipboard:', error));
   };
   //sort
   const [selectedFilter] = useState('');
@@ -185,21 +191,37 @@ const Dash = () => {
 
 
 
-  const handleDeleteBookmark = (index) => {
-    // Create a copy of the current bookmarks array
-    const updatedBookmarks = [...bookmarks];
-    // Remove the bookmark at the specified index
-    updatedBookmarks.splice(index, 1);
+ const handleDeleteBookmark = async (index) => {
+  try {
+    const bookmarkIdToDelete = bookmarks[index].id;
+    // Use deleteBookmarkApi to delete the bookmark by its ID
+    await deleteBookmarkApi(bookmarkIdToDelete);
+
+    // Create a copy of the current bookmarks array excluding the deleted bookmark
+    const updatedBookmarks = bookmarks.filter((bookmark) => bookmark.id !== bookmarkIdToDelete);
+
     // Update the state with the new bookmarks array
     setBookmarks(updatedBookmarks);
-  };
+  } catch (error) {
+    // Handle error
+    console.error('Error deleting bookmark:', error);
+  }
+};
 
   const handleShareBookmark = (index) => {
     // Assuming you want to share the bookmark in a modal or perform some sharing functionality
     const bookmarkToShare = bookmarks[index];
-    // Display a modal or perform sharing functionality based on the bookmarkToShare data
-    console.log(`Share bookmark at index ${index}`, bookmarkToShare);
+    const contentToCopy = `${bookmarkToShare.title}\n${bookmarkToShare.description}\n${bookmarkToShare.url}`;
+
+  // Copy content to clipboard and show a message
+  copyToClipboard(contentToCopy);
+
+  // Reset the copied status after a few seconds
+  setTimeout(() => setIsCopied(false), 3000);
   };
+
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -269,7 +291,11 @@ const Dash = () => {
 
     return (
     <div>
-
+{isCopied && (
+        <div className="alert alert-success" role="alert">
+          Content copied to clipboard!
+        </div>
+      )}
     <div className='book'>
       <title>Booking</title>
       <meta charSet="utf-8" />
@@ -283,36 +309,39 @@ const Dash = () => {
             style={{ color: 'rgb(201, 131, 1)' }}
             onClick={toggleFormVisibility}
           > 
-            <li>Add bookmarks</li>
+            <li> <i className="fas fa-bookmark"></i> {/* Bookmark Icon */}
+             
+            </li>
           </button>
        {/* Add a button to toggle TagsPopup visibility //tags.js page*/} 
        <button style={{ color: 'rgb(201, 131, 1)' }} onClick={toggleTagsPopupVisibility}>
-            <li>Tags</li> 
+            <li> <i className="fas fa-tags"></i> {/* Tags Icon */}</li> 
           </button>
 
           <button style={{ color: 'rgb(201, 131, 1)' }} onClick={toggleSearchPopupVisibility}>
-            <li>Search</li>
+            <li> <i className="fas fa-search"></i> {/* Search Icon */}</li>
           </button>
           <div className='tabular' style={{ color: 'rgb(201, 131, 1)' }}>
      
           {/* ... (existing code) */}
           <button style={{ color: 'rgb(201, 131, 1)' }} onClick={toggleFilterPopupVisibility}>
-            <li>Filter</li>
+            <li><i className="fas fa-filter"></i> </li>
           </button>
      
       </div>
 
-      {/* Display the filter modal if isFilterModalVisible is true */}
-      {isFilterPopupVisible && (
+    
+
+        </ul>
+      </div>
+        {/* Display the filter modal if isFilterModalVisible is true */}
+        {isFilterPopupVisible && (
         <FilterPopup
           selectedFilter={selectedFilter}
           applyFilter={applyFilter}
           toggleFilterPopupVisibility={toggleFilterPopupVisibility}
         />
       )}
-
-        </ul>
-      </div>
       {/* Display SearchPopup if isSearchPopupVisible is true */}
       {isSearchPopupVisible && (
         <SearchPopup
@@ -384,9 +413,16 @@ const Dash = () => {
     />
   </div>
         
-          <button type="button" className="btn btn-primary"  onClick={handleAddBookmark}>
+          <button type="button" className="addbutt"  onClick={handleAddBookmark}>
+          
             Add Bookmark
           </button>
+          <button
+        type="button"
+  className="addbutt" 
+  onClick={toggleFormVisibility}>
+  Close
+</button>
 
       </form>
       {errorMessage && (
@@ -479,7 +515,7 @@ const Dash = () => {
               handleSaveBookmark(index)
               }}
             >
-              Save
+             <i className="fas fa-save"></i> {/* Save Icon */}
             </button>
             <button
               className="btn btn-secondary btn-sm"
@@ -491,8 +527,9 @@ const Dash = () => {
                 setdescription(bookmark.description)
                 setEditingBookmarkIndex(null);
               }}
+              
             >
-              Cancel
+             <i className="fas fa-times"></i>  {/*cancel*/}
             </button>
           </>
         ) : (
@@ -501,13 +538,13 @@ const Dash = () => {
               className="btn btn-danger btn-sm"
               onClick={() => handleDeleteBookmark(index)}
             >
-              Delete
+             <i className="fas fa-trash-alt"></i> {/* Delete Icon */}
             </button>
             <button
               className="btn btn-success btn-sm"
               onClick={() => handleShareBookmark(index)}
             >
-              Share
+              <i className="fas fa-copy"></i> {/* Copy Icon */}
             </button>
             <button
               className="btn btn-primary btn-sm"
@@ -519,7 +556,7 @@ const Dash = () => {
                 setdescription(bookmark.description)
               }}
             >
-              Edit
+             <i className="fas fa-edit"></i> {/* Edit Icon */}
             </button>
           </>
         )}
