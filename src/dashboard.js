@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
+import { useNavigate } from 'react-router-dom';
 import './css/dashboard.css'
+import booktext from '../src/pic/my-My Bookmarks.png'
 import TagsPopup from './tags'
 import SearchPopup from './SearchPopup';
 import FilterPopup from './FilterPopup';
@@ -18,6 +20,10 @@ const Dash = () => {
   const [isTagsPopupVisible, setTagsPopupVisible] = useState(false);//tags.js page
   const [selectedTags, setSelectedTags] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
+  const navigate=useNavigate();
+  const handleClick=()=>
+  {navigate('/loginpage')
+  }
   const [isSearchPopupVisible, setSearchPopupVisible] = useState(false);
   const toggleSearchPopupVisibility = () => {
     setSearchPopupVisible(!isSearchPopupVisible);
@@ -27,6 +33,9 @@ const Dash = () => {
     navigator.clipboard.writeText(content)
       .then(() => setIsCopied(true))
       .catch((error) => console.error('Error copying to clipboard:', error));
+  };
+  const truncateUrl = (url, maxLength) => {
+    return url.length > maxLength ? `${url.slice(0, maxLength)}...` : url;
   };
   //sort
   const [selectedFilter] = useState('');
@@ -103,7 +112,7 @@ const Dash = () => {
       }
     };
   
-    fetchTagsData();
+    fetchTagsData(); 
   }, []);
   useEffect(() => {
     const fetchTagsData = async () => {
@@ -300,7 +309,10 @@ const Dash = () => {
       <title>Booking</title>
       <meta charSet="utf-8" />
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" />
-      <center><h3 className='mybook'><b>My Bookmarks</b></h3></center>
+      <center><h3 className='yourbook'> <img
+      src={booktext}
+      alt='Your Image Alt Text'
+    /></h3></center>
       
       <div className='tabular' style={{ color: 'rgb(201, 131, 1)' }}>
         <ul>
@@ -313,6 +325,7 @@ const Dash = () => {
              
             </li>
           </button>
+         
        {/* Add a button to toggle TagsPopup visibility //tags.js page*/} 
        <button style={{ color: 'rgb(201, 131, 1)' }} onClick={toggleTagsPopupVisibility}>
             <li> <i className="fas fa-tags"></i> {/* Tags Icon */}</li> 
@@ -321,14 +334,19 @@ const Dash = () => {
           <button style={{ color: 'rgb(201, 131, 1)' }} onClick={toggleSearchPopupVisibility}>
             <li> <i className="fas fa-search"></i> {/* Search Icon */}</li>
           </button>
-          <div className='tabular' style={{ color: 'rgb(201, 131, 1)' }}>
+        
      
           {/* ... (existing code) */}
           <button style={{ color: 'rgb(201, 131, 1)' }} onClick={toggleFilterPopupVisibility}>
             <li><i className="fas fa-filter"></i> </li>
           </button>
+
+          <button style={{ color: 'rgb(201, 131, 1)' }} onClick={handleClick}>
+            <li><i className="fas fa-sign-out-alt"></i> </li>
+          </button>
+        
      
-      </div>
+    
 
     
 
@@ -468,9 +486,16 @@ const Dash = () => {
       onChange={(e) => seturl(e.target.value)}
     />
   ) : (
-    <a href={bookmark.url} target="_blank" rel="noopener noreferrer">
-    {bookmark.url}
+    <div className="url-cell">
+    <a
+      href={bookmark.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={bookmark.url} // Show the full URL as a tooltip
+    >
+      {truncateUrl(bookmark.url, 30)} {/* Truncate the URL to 30 characters */}
     </a>
+  </div>
   )}
 </td>
 

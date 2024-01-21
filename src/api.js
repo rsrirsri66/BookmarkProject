@@ -10,7 +10,7 @@ export const fetchBookmarks = async () => {
         'Authorization': 'Bearer '+localStorage.getItem('token')
       },
     });
-    return response.data;
+    return response.data; 
   } catch (error) {
     console.error('Error fetching bookmarks:', error);
     throw error;

@@ -207,7 +207,10 @@ body {
 .btn-success {
   background-color: #28a745;
 }
-
+.yourbook img {
+  width: 200px; /* Set a specific width */
+  height: auto; /* Allow the height to adjust proportionally */
+}
 .btn-danger {
   background-color: #dc3545;
 }

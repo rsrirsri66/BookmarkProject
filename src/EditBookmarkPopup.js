@@ -23,7 +23,7 @@ const EditBookmarkPopup = ({ bookmark, onSave, onCancel }) => {
       <input
         type="text"
         id="editTitle"
-        name="title"
+        name="title" 
         value={editedBookmark.title}
         onChange={handleInputChange}
       />

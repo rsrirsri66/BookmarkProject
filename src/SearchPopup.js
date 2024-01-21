@@ -42,7 +42,11 @@ const SearchPopup = ({ closeSearchPopup, bookmarks}) => {
         {searchResults.map((result) => (
           <li key={result.id}>
             <p>{result.title}</p>
-            <p>{result.url}</p>
+            {result.url && (
+                <a href={result.url} target="_blank" rel="noopener noreferrer">
+                  {result.url}
+                </a>
+              )}
             <p>{result.description}</p>
            <p>{result.tag_title}</p>
            {console.log('tags:',result)}

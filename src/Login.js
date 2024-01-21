@@ -3,6 +3,7 @@ import { TextField } from '@mui/material';
 import { auth } from './firebase';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import './css/login.css';
+import imgs from '../src/pic/Bookmark-Logo.png'
 import PhoneIcon from '@mui/icons-material/Phone';
 import { useNavigate } from 'react-router-dom';
 //import imrt_logo from './imarticusmoblogo.png';
@@ -11,8 +12,8 @@ const Login = () => {
   const [phone, setPhone] = useState('+91');
   const [hasFilled, setHasFilled] = useState(false);
   const [otp, setOtp] = useState('');
+  const [confirmationResult] = useState(null);
   const navigate=useNavigate();
-  const [confirmationResult, setConfirmationResult] = useState(null);
    const handleClick=()=>
    {navigate('/dashboard')
    }
@@ -67,7 +68,7 @@ const Login = () => {
       confirmationResult.confirm(otp)
         .then((result) => {
           let user = result.user;
-          console.log(user);
+          console.log(user); 
           alert('User signed in successfully');
           // Move the navigation logic here, only when OTP is correct
           handleClick(); // This line navigates to the next page
@@ -82,8 +83,15 @@ const Login = () => {
     handleClick();
   }
   return (
+    <div className='log'>
     <div className='app__container'>
-       <center><h3 style={{ color: 'rgb(201, 131, 1)',fontSize: '44px' }}><b>Bookmarks</b></h3></center>
+       <center> <div id='your-image-container'>
+    <img
+      src={imgs}
+      alt='Your Image Alt Text'
+      className='your-image-class'
+    />
+  </div></center>
       {hasFilled ? (
         <>
         <div id='sign_in'>
@@ -130,7 +138,7 @@ const Login = () => {
 
       <div id="recaptcha"></div>
       
-    </div>
+    </div></div>
   );
 }
 

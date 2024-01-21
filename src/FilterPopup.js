@@ -21,7 +21,7 @@ const FilterPopup = ({ selectedFilter, applyFilter, toggleFilterPopupVisibility 
       />
       <button className="filter-close" onClick={toggleFilterPopupVisibility}>Close</button>
     </div>
-  );
+  ); 
 };
 
 export default FilterPopup;
